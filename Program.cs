@@ -1,3 +1,7 @@
+using Microsoft.Data.Sqlite;
+using LibraryManagementSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using LibraryManagementSystem.Data;
 
 namespace LibraryManagementSystem {
     public class Program {
@@ -7,6 +11,12 @@ namespace LibraryManagementSystem {
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            builder.Services.AddDbContext<LibraryContext>(opt => opt.UseSqlite(
+                builder.Configuration["ConnectionStrings:SQliteDefault"]), 
+                ServiceLifetime.Scoped
+            );
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
