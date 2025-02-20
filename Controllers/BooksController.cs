@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
 using System.Diagnostics;
+using SQLitePCL;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace LibraryManagementSystem.Controllers
 {
@@ -24,9 +26,19 @@ namespace LibraryManagementSystem.Controllers
 
         // GET: books
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+        public async Task<ActionResult<IEnumerable<Book>>> GetBooks(int lastID = 0, int pageSize = 10)
         {
-            return await _context.Books.Include(b => b.Author).ToListAsync();
+            
+            var books =  await _context.Books
+                .OrderBy(b=>b.ID)
+                .Where(b=>b.ID >= lastID)
+                .Take(pageSize)
+                .Include(b => b.Author)
+                .ToListAsync();
+            var next = lastID + pageSize;
+            Response.Headers.Append("Link", 
+                String.Format("https://localhost:7078/books?lastID={0}&pageSize={1}",next, pageSize));
+            return books;
         }
 
 
