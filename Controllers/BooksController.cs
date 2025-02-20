@@ -26,7 +26,7 @@ namespace LibraryManagementSystem.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
-            return await _context.Books.ToListAsync();
+            return await _context.Books.Include(b => b.Author).ToListAsync();
         }
 
 
@@ -66,10 +66,16 @@ namespace LibraryManagementSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
+            var author = await _context.Authors.FindAsync(book.AuthorId);
+            if (author == null) {
+                return BadRequest("author doesn't exist in database");
+            }
+            book.ID = null;
+            book.Author = author;
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBook", new { id = book.ID }, book);
+            return CreatedAtAction("GetBooks", new { id = book.ID }, book);
         }
 
         // DELETE: books/5
