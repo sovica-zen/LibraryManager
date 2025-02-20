@@ -41,6 +41,7 @@ namespace LibraryManagementSystem.Controllers
             }
 
             _context.Entry(book).State = EntityState.Modified;
+            
 
             try
             {
@@ -69,6 +70,10 @@ namespace LibraryManagementSystem.Controllers
             var author = await _context.Authors.FindAsync(book.AuthorId);
             if (author == null) {
                 return BadRequest("author doesn't exist in database");
+            }
+            if (book.PublicationYear > DateTime.Now.Year) {
+                ModelState.AddModelError("invalid date", "date of publication cannot be in the future");
+                return BadRequest(ModelState);
             }
             book.ID = null;
             book.Author = author;
