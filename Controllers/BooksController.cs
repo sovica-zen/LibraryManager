@@ -26,9 +26,8 @@ namespace LibraryManagementSystem.Controllers
 
         // GET: books
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooks(int lastID = 0, int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<Book>>> GetBooks(int lastID = 0, int pageSize = 50)
         {
-            
             var books =  await _context.Books
                 .OrderBy(b=>b.ID)
                 .Where(b=>b.ID >= lastID)
