@@ -38,10 +38,10 @@ namespace LibraryManagementSystem.Controllers
           
             author.ID = null;
             if (!Models.DataValidation.IsValidISO(author.DateOfBirth)) {
-                ModelState.AddModelError("invalid date", "date is not in iso8601 format");
+                ModelState.AddModelError("invalid date", "date is not in valid iso8601 format");
                 return BadRequest(ModelState);
             }
-            if (Convert.ToInt32(author.DateOfBirth) > DateTime.Now.Year) {
+            if (Convert.ToInt32(author.DateOfBirth[0..4]) > DateTime.Now.Year) {
                 ModelState.AddModelError("invalid date", "date of birth cannot be in the future");
                 return BadRequest(ModelState);
             }

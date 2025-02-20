@@ -11,7 +11,7 @@ namespace LibraryManagementSystem.Models {
         [Required]
         [StringLength(255)]
         public required string Name { get; set; }
-        [Range(-5000, 2200)]
+        //[Range(-5000, 2200)]
         public string? DateOfBirth { get; set; }
 
     }
