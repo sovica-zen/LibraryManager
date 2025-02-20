@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using System.Diagnostics;
 
 namespace LibraryManagementSystem.Controllers
 {
@@ -88,21 +89,59 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<Book>> GetBooksSearch(string query)//do similarity search
+        public async Task<ActionResult<IEnumerable<Book>>> GetBooksSearch(string query)//do similarity search
         {
-            var book = await _context.Books.FindAsync(0);
+            //var books = await _context.Books.Where(b => b.Title.Equals(query)).ToListAsync();
 
-            if (book == null)
+            var books = await _context.Books.ToListAsync();
+            List<Book> similar = [];
+
+            foreach (var b in books) {
+                Console.WriteLine(Levenstein(b.Title, query));
+                if (Levenstein(b.Title, query) <= 1) {
+                    similar.Add(b);
+                }
+            }
+
+            if (books == null || similar == null)
             {
                 return NotFound();
             }
 
-            return book;
+            if (books.Count == 0) {
+                return NoContent();
+            }
+
+            return similar;
         }
 
         private bool BookExists(int id)
         {
             return _context.Books.Any(e => e.ID == id);
+        }
+
+        //private List<string> SimilarStrings(string original) {
+        //    List<string> modified = [];
+        //    for(int i=0; i<original.Length; i++) {
+        //        modified.Add(original.Remove(i, 1));
+        //    }
+
+        //    return modified;
+        //}
+
+        //https://en.wikipedia.org/wiki/Levenshtein_distance#Definition
+        private int Levenstein(string first, string second) {
+            List<string> modified = [];
+            if (first.Length == 0) return second.Length;
+            if (second.Length == 0) return first.Length;
+            if (first[0].ToString().ToLower() == second[0].ToString().ToLower()) {
+                return Levenstein(first[1..], second[1..]);
+            }
+            else {
+                List<int> temp = [Levenstein(first[1..], second), Levenstein(first, second[1..]), Levenstein(first[1..], second[1..])];
+                return 1 + temp.Min();
+            }
+
         }
     }
 }
