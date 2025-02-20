@@ -23,6 +23,7 @@ namespace LibraryManagementSystem.Controllers
 
         // GET: authors
         [HttpGet]
+        [ResponseCache(VaryByHeader = "User-Agent", Duration = 30)]
         public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
         {
             return await _context.Authors.ToListAsync();
